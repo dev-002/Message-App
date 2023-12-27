@@ -30,7 +30,9 @@ const OpenConversations = () => {
                 <div
                   ref={lastMessage ? setRef : null}
                   className={`my-1 d-flex flex-column ${
-                    message.fromMe ? "align-self-end" : ""
+                    message.fromMe
+                      ? "align-self-end align-items-end"
+                      : "align-items-start"
                   }`}
                   key={index}
                 >

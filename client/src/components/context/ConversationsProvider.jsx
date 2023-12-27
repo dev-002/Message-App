@@ -1,6 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import { useContacts } from "./ContactsProvider";
+import { useSocket } from "./SocketProvider";
 
 const ConversationsContext = React.createContext();
 
@@ -15,6 +16,7 @@ export function ConversationsProvider({ id, children }) {
   );
   const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
   const { contacts } = useContacts();
+  const socket = useSocket();
 
   function createConversations(recipients) {
     setConversations((prevValues) => {
@@ -22,33 +24,44 @@ export function ConversationsProvider({ id, children }) {
     });
   }
 
-  function addMessageToConversatino({ recipients, text, sender }) {
-    setConversations((prevConversations) => {
-      let madeChange = false;
-      let newMessage = { sender, text };
+  const addMessageToConversatino = useCallback(
+    ({ recipients, text, sender }) => {
+      setConversations((prevConversations) => {
+        let madeChange = false;
+        let newMessage = { sender, text };
 
-      const newConversations = prevConversations.map((conversation) => {
-        console.log(conversation);
-        if (arrayEquality(conversation.recipients, recipients)) {
-          madeChange = true;
-          return {
-            ...conversation,
-            messages: [...conversation.messages, newMessage],
-          };
+        const newConversations = prevConversations.map((conversation) => {
+          console.log(conversation);
+          if (arrayEquality(conversation.recipients, recipients)) {
+            madeChange = true;
+            return {
+              ...conversation,
+              messages: [...conversation.messages, newMessage],
+            };
+          }
+          return conversation;
+        });
+
+        if (madeChange) {
+          return newConversations;
+        } else {
+          // when a unkown person starts a new conversation with you or in a group
+          return [...prevConversations, { recipients, messages: [newMessage] }];
         }
-        return conversation;
       });
+    },
+    [setConversations]
+  );
 
-      if (madeChange) {
-        return newConversations;
-      } else {
-        // when a unkown person starts a new conversation with you or in a group
-        return [...prevConversations, { recipients, messages: [newMessage] }];
-      }
-    });
-  }
+  useEffect(() => {
+    if (socket == null) return;
+
+    socket.on("receive-message", addMessageToConversatino);
+    return () => socket.off("receive-message");
+  }, [socket, addMessageToConversatino]);
 
   function sendMessage(recipients, text) {
+    socket.emit("send-message", { recipients, text });
     addMessageToConversatino({ recipients, text, sender: id });
   }
 
@@ -94,6 +107,7 @@ export function ConversationsProvider({ id, children }) {
   );
 }
 
+// Checking if 2 Array Equal
 function arrayEquality(a, b) {
   if (a.length !== b.length) return false;
   a.sort();
