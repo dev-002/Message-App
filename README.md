@@ -1,12 +1,14 @@
 # WhatsApp Clone with React and Socket.io
 
-Overview
+## Overview
+
 This project is a based on the popular messaging application WhatsApp. It is built using React for the frontend and Socket.io for real-time communication between users.
 
-Features
-Real-time chat functionality
-Group chat support
-Responsive design
+## Features
+
+- Real-time chat functionality
+- Group chat support
+- Responsive design
 
 ## Tech Stack
 
@@ -25,30 +27,31 @@ Responsive design
 1. Clone the Repository:
 
 ```
-git clone https://github.com/your-username/whatsapp-clone.git
-cd whatsapp-clone
-Install Dependencies:
+git clone https://github.com/dev-002/Message-App.git
+cd Message-App
 ```
 
 2. Install Dependencies:
 
 ```
-cd frontend
+cd client
 npm install
 
-cd backend
+cd server
 npm install
 ```
 
-3. Start the backend server
+3. Start the server and frontend application
 
-cd backend
+```
+cd server
 npm start
+```
 
-4. Start the frontend application
-
-cd frontend
+```
+cd client
 npm start
+```
 
-5. Access the Application:
-   Open your browser and go to http://localhost:5173 to access the Messaging App.
+4. Access the Application:
+   Open your browser and go to `http://localhost:5173` to access the Messaging App.
